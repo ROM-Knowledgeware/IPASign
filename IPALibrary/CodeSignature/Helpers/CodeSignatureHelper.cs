@@ -241,22 +241,5 @@ namespace IPALibrary.CodeSignature
             entitlementsBlob.Data = entitlements.GetBytes(PListNet.PListFormat.Xml);
             return entitlementsBlob;
         }
-
-        /*
-        public static int PadTo64Bytes(int value)
-        {
-            int padding = (64 - (value % 64)) % 64;
-            return value + padding;
-        }
-
-        public static byte[] PadTo64Bytes(byte[] buffer)
-        {
-            if (buffer.Length % 64 > 0)
-            {
-                int padding = (64 - (buffer.Length % 64)) % 64;
-                return ByteUtils.Concatenate(buffer, new byte[padding]);
-            }
-            return buffer;
-        }*/
     }
 }
