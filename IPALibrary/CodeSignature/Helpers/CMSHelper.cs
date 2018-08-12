@@ -38,14 +38,13 @@ namespace IPALibrary.CodeSignature
             IX509Store certificateStore = X509StoreFactory.Create("Certificate/Collection", new X509CollectionStoreParameters(certificateChain));
             
             CmsSignedDataGenerator generator = new CmsSignedDataGenerator();
+#if MAX_CMS_COMPATIBILITY
+            // Optional: BouncyCastle v1.8.3 has the option to use DER instead of BER to store the certificate chain
+            generator.UseDerForCerts = true;
+#endif
             generator.AddSigner(privateKey.Key, signingCertificate, CmsSignedDataGenerator.DigestSha256);
             generator.AddCertificates(certificateStore);
-#if MAX_CMS_COMPATIBILITY
-            // Optional: We use a modified version of BouncyCastle that has the option to use DER instead of BER to store the certificate chain
-            CmsSignedData cmsSignature = generator.Generate(CmsSignedGenerator.Data, new CmsProcessableByteArray(messageToSign), false, true);
-#else
             CmsSignedData cmsSignature = generator.Generate(CmsSignedGenerator.Data, new CmsProcessableByteArray(messageToSign), false);
-#endif
             return cmsSignature.GetEncoded();
         }
 
