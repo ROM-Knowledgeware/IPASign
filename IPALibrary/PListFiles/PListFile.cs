@@ -68,7 +68,7 @@ namespace IPALibrary
                 }
                 xml = String.Join("\n", lines) + "\n";
 #endif
-                byte[] bytes = ASCIIEncoding.GetEncoding(28591).GetBytes(xml);
+                byte[] bytes = Encoding.UTF8.GetBytes(xml);
                 return bytes;
             }
             return result.ToArray();
