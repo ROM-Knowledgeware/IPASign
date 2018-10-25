@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 ROM Knowledgeware. All rights reserved.
+/* Copyright (C) 2017-2018 ROM Knowledgeware. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -162,7 +162,7 @@ namespace IPALibrary.CodeSignature
 
         public static CodeDirectoryBlob CreateCodeDirectoryBlob(int codeLength, string ident, string teamID)
         {
-            HashType hashType = HashType.SHA1;
+            HashType hashType = HashType.SHA256;
             int pageSize = 4096;
 
             CodeDirectoryBlob codeDirectory = new CodeDirectoryBlob();
