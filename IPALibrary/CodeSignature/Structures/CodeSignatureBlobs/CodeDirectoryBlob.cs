@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 ROM Knowledgeware. All rights reserved.
+/* Copyright (C) 2017-2018 ROM Knowledgeware. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -12,11 +12,17 @@ using Utilities;
 
 namespace IPALibrary.CodeSignature
 {
+    /// <remarks>
+    /// Reference:
+    /// codedirectory.h (libsecurity_codesigning: https://git.saurik.com/apple/security.git )
+    /// </remarks>
     public class CodeDirectoryBlob : CodeSignatureBlob
     {
         public const uint Signature = 0xfade0c02; // CSMAGIC_CODEDIRECTORY
         public const uint ScatterMinimumVersion = 0x20100;
         public const uint TeamIDMinimumVersion = 0x20200;
+        public const uint CodeLimit64MinimumVersion = 0x20300;
+        public const uint ExecSegMinimumVersion = 0x20400;
 
         public const int FixedLengthV20001 = 44;
         public const int FixedLengthV20100 = 48;
@@ -44,9 +50,14 @@ namespace IPALibrary.CodeSignature
         public uint Spare2;
         // uint ScatterOffset;        // Version 0x20100
         // uint TeamIDOffset;         // Version 0x20200
+        public uint Spare3;           // Version 0x20300
+        public ulong CodeLimit64;     // Version 0x20300
+        public ulong ExecSegBase;     // Version 0x20400
+        public ulong ExecSegLimit;    // Version 0x20400
+        public ulong ExecSegFlags;    // Version 0x20400
 
         public string Ident;
-        public string TeamID;
+        public string TeamID;         // Version 0x20200
         public List<byte[]> SpecialHashes = new List<byte[]>();
         public List<byte[]> CodeHashes = new List<byte[]>();
 
@@ -78,6 +89,17 @@ namespace IPALibrary.CodeSignature
                 if (Version >= TeamIDMinimumVersion)
                 {
                     teamIDOffset = BigEndianConverter.ToUInt32(buffer, offset + 48);
+                    if (Version >= CodeLimit64MinimumVersion)
+                    {
+                        Spare3 = BigEndianConverter.ToUInt32(buffer, offset + 52);
+                        CodeLimit64 = BigEndianConverter.ToUInt64(buffer, offset + 56);
+                        if (Version >= ExecSegMinimumVersion)
+                        {
+                            ExecSegBase = BigEndianConverter.ToUInt64(buffer, offset + 64);
+                            ExecSegLimit = BigEndianConverter.ToUInt64(buffer, offset + 72);
+                            ExecSegFlags = BigEndianConverter.ToUInt64(buffer, offset + 80);
+                        }
+                    }
                 }
             }
 
@@ -114,6 +136,14 @@ namespace IPALibrary.CodeSignature
                 if (Version >= TeamIDMinimumVersion)
                 {
                     fixedLength += 4;
+                    if (Version >= CodeLimit64)
+                    {
+                        fixedLength += 12;
+                        if (Version >= ExecSegMinimumVersion)
+                        {
+                            fixedLength += 24;
+                        }
+                    }
                 }
             }
 
@@ -155,6 +185,17 @@ namespace IPALibrary.CodeSignature
                 if (Version >= TeamIDMinimumVersion)
                 {
                     BigEndianWriter.WriteUInt32(buffer, offset + 48, (uint)teamIDOffset);
+                    if (Version >= CodeLimit64MinimumVersion)
+                    {
+                        BigEndianWriter.WriteUInt32(buffer, offset + 52, Spare3);
+                        BigEndianWriter.WriteUInt64(buffer, offset + 56, CodeLimit64);
+                        if (Version >= ExecSegMinimumVersion)
+                        {
+                            BigEndianWriter.WriteUInt64(buffer, offset + 64, ExecSegBase);
+                            BigEndianWriter.WriteUInt64(buffer, offset + 72, ExecSegLimit);
+                            BigEndianWriter.WriteUInt64(buffer, offset + 80, ExecSegFlags);
+                        }
+                    }
                 }
             }
 
@@ -197,20 +238,25 @@ namespace IPALibrary.CodeSignature
                     if (Version >= TeamIDMinimumVersion)
                     {
                         length += 4;
+                        if (Version >= CodeLimit64)
+                        {
+                            length += 12;
+                            if (Version >= ExecSegMinimumVersion)
+                            {
+                                length += 24;
+                            }
+                        }
                     }
                 }
 
-                if (Ident.Length > 0)
+                if (Ident != null && Ident.Length > 0)
                 {
                     length += Ident.Length + 1;
                 }
 
-                if (Version >= TeamIDMinimumVersion)
+                if (Version >= TeamIDMinimumVersion && TeamID != null && TeamID.Length > 0)
                 {
-                    if (TeamID.Length > 0)
-                    {
-                        length += TeamID.Length + 1;
-                    }
+                    length += TeamID.Length + 1;
                 }
                 length += SpecialHashes.Count * HashSize;
                 length += CodeHashes.Count * HashSize;
