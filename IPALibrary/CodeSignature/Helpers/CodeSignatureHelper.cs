@@ -151,7 +151,7 @@ namespace IPALibrary.CodeSignature
             SegmentCommandHelper.SetEndOffset(linkEditSegment, finalFileSize);
 
             byte[] codeToHash = ByteReader.ReadBytes(file.GetBytes(), 0, codeLength);
-            UpdateHashes(codeDirectory, codeToHash, infoFileBytes, codeRequirements, codeResourcesBytes, entitlementsBlob);
+            UpdateSpecialHashes(codeDirectory, codeToHash, infoFileBytes, codeRequirements, codeResourcesBytes, entitlementsBlob);
             cmsSignature.Data = CMSHelper.GenerateSignature(certificateChain, privateKey, codeDirectory.GetBytes());
 
             // Store updated code signature:
@@ -186,7 +186,7 @@ namespace IPALibrary.CodeSignature
             return codeDirectory;
         }
 
-        public static void UpdateHashes(CodeDirectoryBlob codeDirectory, byte[] codeToHash, byte[] infoFileBytes, CodeRequirementsBlob codeRequirements, byte[] codeResourcesBytes, EntitlementsBlob entitlements)
+        public static void UpdateSpecialHashes(CodeDirectoryBlob codeDirectory, byte[] codeToHash, byte[] infoFileBytes, CodeRequirementsBlob codeRequirements, byte[] codeResourcesBytes, EntitlementsBlob entitlements)
         {
             codeDirectory.CodeHashes = HashAlgorithmHelper.ComputeHashes(codeDirectory.HashType, codeDirectory.PageSize, codeToHash);
             
