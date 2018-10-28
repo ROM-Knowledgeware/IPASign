@@ -9,6 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Pkcs;
@@ -22,6 +23,11 @@ namespace IPALibrary.CodeSignature
     public class CMSHelper
     {
         public static byte[] GenerateSignature(List<X509Certificate> certificateChain, AsymmetricKeyEntry privateKey, byte[] messageToSign)
+        {
+            return GenerateSignature(certificateChain, privateKey, messageToSign, null);
+        }
+
+        public static byte[] GenerateSignature(List<X509Certificate> certificateChain, AsymmetricKeyEntry privateKey, byte[] messageToSign, AttributeTable signedAttributesTable)
         {
             X509Certificate signingCertificate = certificateChain[certificateChain.Count - 1];
 #if MAX_CMS_COMPATIBILITY
@@ -42,7 +48,7 @@ namespace IPALibrary.CodeSignature
             // Optional: BouncyCastle v1.8.3 has the option to use DER instead of BER to store the certificate chain
             generator.UseDerForCerts = true;
 #endif
-            generator.AddSigner(privateKey.Key, signingCertificate, CmsSignedDataGenerator.DigestSha256);
+            generator.AddSigner(privateKey.Key, signingCertificate, CmsSignedDataGenerator.DigestSha256, signedAttributesTable, null);
             generator.AddCertificates(certificateStore);
             CmsSignedData cmsSignature = generator.Generate(CmsSignedGenerator.Data, new CmsProcessableByteArray(messageToSign), false);
             return cmsSignature.GetEncoded();
