@@ -162,7 +162,7 @@ namespace IPALibrary.CodeSignature
 
         public static CodeDirectoryBlob CreateCodeDirectoryBlob(int codeLength, string ident, string teamID)
         {
-            HashType hashType = HashType.SHA256;
+            HashType hashType = HashType.SHA1;
             int pageSize = 4096;
 
             CodeDirectoryBlob codeDirectory = new CodeDirectoryBlob();
