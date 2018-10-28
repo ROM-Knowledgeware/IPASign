@@ -133,7 +133,7 @@ namespace IPALibrary.CodeSignature
 
             CodeSignatureCommand command = (CodeSignatureCommand)file.LoadCommands[file.LoadCommands.Count - 1];
             int codeLength = (int)command.DataOffset;
-            CodeDirectoryBlob codeDirectory = CreateCodeDirectoryBlob(codeLength, bundleIdentifier, teamID);
+            CodeDirectoryBlob codeDirectory = CreateCodeDirectoryBlob(codeLength, bundleIdentifier, teamID, HashType.SHA1);
             CodeRequirementsBlob codeRequirements = CreateCodeRequirementsBlob(bundleIdentifier, certificateCN);
             EntitlementsBlob entitlementsBlob = CreateEntitlementsBlob(entitlements);
             CmsSignatureBlob cmsSignature = new CmsSignatureBlob();
@@ -160,9 +160,8 @@ namespace IPALibrary.CodeSignature
             ByteWriter.WriteBytes(file.Data, (int)command.DataOffset - file.DataOffset, codeSignatureBytes);
         }
 
-        public static CodeDirectoryBlob CreateCodeDirectoryBlob(int codeLength, string ident, string teamID)
+        public static CodeDirectoryBlob CreateCodeDirectoryBlob(int codeLength, string ident, string teamID, HashType hashType)
         {
-            HashType hashType = HashType.SHA1;
             int pageSize = 4096;
 
             CodeDirectoryBlob codeDirectory = new CodeDirectoryBlob();
