@@ -136,7 +136,7 @@ namespace IPALibrary.CodeSignature
                 if (Version >= TeamIDMinimumVersion)
                 {
                     fixedLength += 4;
-                    if (Version >= CodeLimit64)
+                    if (Version >= CodeLimit64MinimumVersion)
                     {
                         fixedLength += 12;
                         if (Version >= ExecSegMinimumVersion)
@@ -238,7 +238,7 @@ namespace IPALibrary.CodeSignature
                     if (Version >= TeamIDMinimumVersion)
                     {
                         length += 4;
-                        if (Version >= CodeLimit64)
+                        if (Version >= CodeLimit64MinimumVersion)
                         {
                             length += 12;
                             if (Version >= ExecSegMinimumVersion)
