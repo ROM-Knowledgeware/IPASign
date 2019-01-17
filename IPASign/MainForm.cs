@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 ROM Knowledgeware. All rights reserved.
+/* Copyright (C) 2017-2019 ROM Knowledgeware. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -196,13 +196,13 @@ namespace IPASign
                 mobileProvision = new MobileProvisionFile(mobileProvisionBytes);
             }
 
-            if (mobileProvision.PList.DeveloperCertificates.Count == 0)
+            List<byte[]> developerCertificates = mobileProvision.PList.DeveloperCertificates;
+            if (developerCertificates.Count == 0)
             {
                 MessageBox.Show("Mobile Provision does not contain developer certificate information", "Error");
                 return;
             }
 
-            X509Certificate provisionedCertificate = CertificateHelper.GetCertificatesFromBytes(mobileProvision.PList.DeveloperCertificates[0]);
             AsymmetricKeyEntry privateKey;
             X509Certificate signingCertificate = CertificateHelper.GetCertificateAndKeyFromBytes(signingCertificateBytes, certificatePassword, out privateKey);
             if (signingCertificate == null)
@@ -211,6 +211,7 @@ namespace IPASign
                 return;
             }
 
+            X509Certificate provisionedCertificate = CertificateHelper.GetCertificatesFromBytes(developerCertificates[0]);
             if (!provisionedCertificate.Equals(signingCertificate))
             {
                 MessageBox.Show("The signing certificate given does not match the one specified in the Mobile Provision file", "Error");
