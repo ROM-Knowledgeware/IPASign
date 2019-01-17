@@ -211,10 +211,19 @@ namespace IPASign
                 return;
             }
 
-            X509Certificate provisionedCertificate = CertificateHelper.GetCertificatesFromBytes(developerCertificates[0]);
-            if (!provisionedCertificate.Equals(signingCertificate))
+            bool foundMatchingCertificate = false;
+            for (int index = 0; index < developerCertificates.Count; index++)
             {
-                MessageBox.Show("The signing certificate given does not match the one specified in the Mobile Provision file", "Error");
+                X509Certificate provisionedCertificate = CertificateHelper.GetCertificatesFromBytes(developerCertificates[index]);
+                if (provisionedCertificate.Equals(signingCertificate))
+                {
+                    foundMatchingCertificate = true;
+                }
+            }
+
+            if (!foundMatchingCertificate)
+            {
+                MessageBox.Show("The signing certificate given does not match any specified in the Mobile Provision file", "Error");
                 return;
             }
 
