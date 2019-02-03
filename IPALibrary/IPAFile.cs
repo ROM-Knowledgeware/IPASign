@@ -1,4 +1,4 @@
-/* Copyright (C) 2017 ROM Knowledgeware. All rights reserved.
+/* Copyright (C) 2017-2019 ROM Knowledgeware. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -250,6 +250,29 @@ namespace IPALibrary
             byte[] executableBytes = MachObjectHelper.PackMachObjects(files);
 
             ReplaceExecutable(executableBytes);
+        }
+
+        public bool ContainsFolder(string folderPath)
+        {
+            foreach (ZipEntry entry in m_zipFile)
+            {
+                if (entry.IsDirectory)
+                {
+                    if (entry.Name.Equals(m_appDirectoryPath + folderPath + ZipDirectorySeparator, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool HasFrameworksFolder
+        {
+            get
+            {
+                return ContainsFolder("Frameworks");
+            }
         }
     }
 }
