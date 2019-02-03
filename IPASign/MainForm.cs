@@ -245,6 +245,12 @@ namespace IPASign
                 ipaFile.ReplaceMobileProvision(mobileProvisionBytes);
             }
 
+            if (ipaFile.HasFrameworksFolder)
+            {
+                MessageBox.Show("Signing an IPA containing a framework is not supported", "Not supported");
+                return;
+            }
+
             ipaFile.ResignIPA(certificateChain, privateKey);
             try
             {
